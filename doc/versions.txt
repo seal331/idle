@@ -1,0 +1,71 @@
+Pre release alpha 0.10
+=====================
+_ fixed Uniplus 1.4 kernel boot bug
+_ fixed speed (was 2.5 MHz instead of 5...)
+_ still a bug in display acceleration
+
+
+Pre release alpha 0.9
+=====================
+_ fixed Xenix hang (modified IRQ handling)
+_ added power off support
+
+Pre release alpha 0.8
+=====================
+_ minor disk emulation fixes
+_ initial Xenix emulation (hangs)
+
+
+Pre release alpha 0.7
+=====================
+_ moved to BSD license
+_ removed old castaway sequels in code (the debugger still uses castaway code).
+_ corrected mouse problem
+_ added F1/F2 can be used to activate or deactivate the speed limiter
+
+
+
+Pre release alpha 0.6
+=====================
+_ LOS 2.0 and 3.0 initial support ;-)
+_ profile (5Mb) support
+_ faster video update for small updates
+_ exact speed (5MHz) (with a very primitive system... (taken from my thomson MO5 emulator...))
+_ unclamping disk support
+
+
+Pre release alpha 0.5
+=====================
+_ much better COP support
+_ minor mmu updates
+_ memory parity support
+_ scc support (from vmac)
+
+
+Pre release alpha 0.4
+=====================
+_ changed user interface
+_ initial mouse support
+
+Pre release alpha 0.3
+=====================
+_ changed cpu core to musashi (mame version);
+_ now boots macworks XL 3.0 & 2.0
+
+
+Pre release alpha 0.2
+=====================
+_ added VIA support;
+_ added keyboard basical support;
+_ added disk image support;
+_ added basical disk support (ROM patched, can read the boot sector);
+_ added a binary distribution;
+_ added a simplified Serial Number reading support.
+
+
+Pre release alpha 0.1
+=====================
+_ 68k core from Castaway Atari ST emulator; 
+_ debugger;
+_ mmu support;
+_ video display.
