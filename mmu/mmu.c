@@ -1211,22 +1211,26 @@ char*            MemInit(int model)
         if (read_alt_rom("bios/fake_booth.bin")!=NULL) {
         
             //rom=fopen("bios/booth.hi","rb");
-            if (model==1)
+            if (model==1) {
                 rom=fopen("bios/L175REVC.bin","rb");
-            else
+                if (rom==NULL) return "fatal error needs file bios/L175REVC.bin";
+            } else {
                 rom=fopen("bios/341-0175-h","rb");
+                if (rom==NULL) return "fatal error needs file bios/341-0175-h";
+            }
             
-            if (rom==NULL) return "fatal error needs file bios/booth.hi";
             ret=fread(&romtmp[0],512*16,1,rom);
             fclose(rom);
             
             //rom=fopen("bios/booth.lo","rb");
-            if (model==1)
+            if (model==1) {
                 rom=fopen("bios/L176REVC.bin","rb");
-            else
+                if (rom==NULL) return "fatal error needs file bios/L176REVC.bin";
+            } else {
                 rom=fopen("bios/341-0176-h","rb");
+                if (rom==NULL) return "fatal error needs file bios/341-0176-h";
+            }
             
-            if (rom==NULL) return "fatal error needs file bios/booth.lo";
             ret=fread(&romtmp[512*16],512*16,1,rom);
             fclose(rom);
 
