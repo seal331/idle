@@ -371,8 +371,8 @@ int sdl2lisa_scancode(SDLKey key,unsigned char lisaMode)
            case SDLK_COMMA : lkey=0x5D ;break;
 //           case SDLK_STOP   : lkey=0x5E ;break;
 
-           case SDLK_LEFTPAREN : lkey=0x56 ;break;
-           case SDLK_RIGHTPAREN   : lkey=0x57 ;break;
+           case SDLK_LEFTBRACKET : lkey=0x56 ;break;
+           case SDLK_RIGHTBRACKET   : lkey=0x57 ;break;
            
 
            case SDLK_SEMICOLON :     
@@ -431,9 +431,9 @@ int sdl2lisa_scancode(SDLKey key,unsigned char lisaMode)
 void				   
 handleSdlKeyEvent(SDL_Event *event) {
     if (event->type==SDL_KEYDOWN) 
-        via_keyb_event_key(sdl2lisa_scancode(event->key.keysym.sym,0x00));
-    else
         via_keyb_event_key(sdl2lisa_scancode(event->key.keysym.sym,0x80));
+    else
+        via_keyb_event_key(sdl2lisa_scancode(event->key.keysym.sym,0x00));
 }
 
 
@@ -585,6 +585,18 @@ int redraw_lisa(int redraw_all)
         lisa_screen_next=(lisa_screen_cur+1)&1;
 }
 
+void
+unscare_mouse(void) {
+SDL_WM_GrabInput( SDL_GRAB_OFF );
+SDL_ShowCursor(SDL_ENABLE);
+}
+
+void
+scare_mouse(void) {
+SDL_WM_GrabInput( SDL_GRAB_ON );
+SDL_ShowCursor(SDL_DISABLE);
+}
+
 #define TICK_INTERVAL    16
 
 static Uint32 next_time;
@@ -608,6 +620,7 @@ lisa_loop(uint32 targetPC)
      idle_time delta;
      int old_clock=0;
      int skip=3;
+     int l_mouse_x,l_mouse_y;
 
      int instr_cycles;
      int cycles=0;
@@ -616,7 +629,7 @@ lisa_loop(uint32 targetPC)
      IDLE_INIT_FUNC("main_loop()");
      
      loop_exit=0;
-     // scare_mouse();
+     scare_mouse();
      clock68k=0;
      delta.seconds=0;
      delta.subseconds=55;
@@ -637,9 +650,30 @@ lisa_loop(uint32 targetPC)
 				    break;
                 case SDL_MOUSEBUTTONDOWN:
                     if (event.button.button == SDL_BUTTON_RIGHT) {
+                        unscare_mouse();
                         return 0;
                     }
-					
+                    if (event.button.button == SDL_BUTTON_LEFT) {
+                        via_keyb_event_key(0x86);
+					}
+					break;
+                case SDL_MOUSEBUTTONUP:
+                    if (event.button.button == SDL_BUTTON_LEFT) {
+                        via_keyb_event_key(0x06);
+					}
+					break;
+				case SDL_MOUSEMOTION:
+				    l_mouse_x=event.motion.xrel;
+				    l_mouse_y=event.motion.yrel;
+                    if ((l_mouse_x!=0) || (l_mouse_y!=0)) {
+                        if (l_mouse_x<-128) l_mouse_x=-128;
+                        if (l_mouse_x>127) l_mouse_x=127;
+                        if (l_mouse_y<-128) l_mouse_y=-128;
+                        if (l_mouse_y>127) l_mouse_y=127;
+                
+                        via_keyb_update_mouse_pos((int8)l_mouse_x,(int8)l_mouse_y);
+                    }
+				    break;	
 			}	
 		}		 
               // getKeyEvent();
@@ -716,47 +750,10 @@ lisa_loop(uint32 targetPC)
                  if (endVBL())
                      reset_irq_line(VBLIRQ);
               
-              {
-             int l_mouse_x,l_mouse_y;
-             // many thanx to allegro coders for this relative mouse routine ;-)
-//             get_mouse_mickeys(&l_mouse_x,&l_mouse_y);
-             if ((l_mouse_x!=0) || (l_mouse_y!=0)) {
-                if (l_mouse_x<-128) l_mouse_x=-128;
-                if (l_mouse_x>127) l_mouse_x=127;
-                if (l_mouse_y<-128) l_mouse_y=-128;
-                if (l_mouse_y>127) l_mouse_y=127;
-                
-                via_keyb_update_mouse_pos((int8)l_mouse_x,(int8)l_mouse_y);
-                }
-//                else
-//                    getMouseButton();
-                // check for popup
-//                if ((mouse_b & 2)==2) {
-//                   show_mouse(mouse_sprite);
-//                   // waits for release...
-//                   while ((mouse_b&2)==2);
-//                   fastPopup();
-//                   show_mouse(NULL);
-//                }
-//                position_mouse(720/2,364/2);
-             }
           
-//             if ((vblnum&0x03)==0)
-//              if (must_redraw())
                   redraw_lisa(0);
               vblnum++;
               
-/*              
-              if (exact) {
-                            while (vbl<(lastvbl+10)) rest(0);
-              }
-              else {
-                   if (vbl-lastvbl>0)
-                   IDLE_DEBUG("Elapsed vbl=%d running=%d",
-                                       vbl-lastvbl,
-                                       1000/(vbl-lastvbl));
-              }
-*/              
               lastvbl=vbl;
 				SDL_Flip(screen);
 			SDL_Delay(time_left());
@@ -764,7 +761,7 @@ lisa_loop(uint32 targetPC)
           } // while (!loop_exit);
           
 end:
-      // unscare_mouse();
+      unscare_mouse();
       ask_bkpt=0;    
       // disass_debugger();
       // regs_debugger();
@@ -878,6 +875,7 @@ int main() {
                         SDL_GetError());
         exit(1);
     }
+    SDL_EnableUNICODE(true);
 
 	SDLGui_Init();
 	SDLGui_SetScreen(screen);

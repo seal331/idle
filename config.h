@@ -29,7 +29,7 @@ typedef unsigned long   uint32;
 // #define _MEMORY_WRITE_DEBUG_
 
 // by default error log is memory only
-#define _TRACE_LOG_FILE_
+// #define _TRACE_LOG_FILE_
 
 // enable MMU debug
 // (disabled to speed up the emulator)
