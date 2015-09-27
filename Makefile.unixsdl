@@ -1,0 +1,90 @@
+CPP  = g++ -D__DEBUG__
+CC   = gcc -D__DEBUG__
+OBJ  = main_sdl.o sdlgui.o dlgFileSelect.o scandir.o file.o cpu/debug.o mmu/mmu.o io/via_keyb.o io/via_hdd.o disk/disk_image.o disk/disk_ctrl.o debug/trace.o cpu/m68kcpu.o cpu/m68kops.o cpu/m68kopnz.o cpu/m68kopdm.o cpu/m68kopac.o io/via.o time/timer.o irq/irq.o io/8530scc.o
+LINKOBJ  = main_sdl.o sdlgui.o dlgFileSelect.o scandir.o file.o cpu/debug.o mmu/mmu.o io/via_keyb.o io/via_hdd.o disk/disk_image.o disk/disk_ctrl.o debug/trace.o cpu/m68kcpu.o cpu/m68kops.o cpu/m68kopnz.o cpu/m68kopdm.o cpu/m68kopac.o io/via.o time/timer.o irq/irq.o io/8530scc.o
+
+
+LIBS = $$(sdl-config --libs)
+
+
+INCS =   
+CXXINCS =  
+BIN  = idle
+CXXFLAGS = $(CXXINCS) $$(sdl-config --cflags)
+CFLAGS = $(INCS) $$(sdl-config --cflags)
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before idle all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o "idle" $(LIBS)
+
+main_sdl.o: main_sdl.cpp
+	$(CPP) -c main_sdl.cpp -o main_sdl.o $(CXXFLAGS)
+
+sdlgui.o: sdlgui.cpp
+	$(CPP) -c sdlgui.cpp -o sdlgui.o $(CXXFLAGS)
+
+dlgFileSelect.o: dlgFileSelect.cpp
+	$(CPP) -c dlgFileSelect.cpp -o dlgFileSelect.o $(CXXFLAGS)
+
+scandir.o: scandir.cpp
+	$(CPP) -c scandir.cpp -o scandir.o $(CXXFLAGS)
+
+file.o: file.cpp
+	$(CPP) -c file.cpp -o file.o $(CXXFLAGS)
+
+cpu/debug.o: cpu/debug.c
+	$(CPP) -c cpu/debug.c -o cpu/debug.o $(CXXFLAGS)
+
+mmu/mmu.o: mmu/mmu.c
+	$(CPP) -c mmu/mmu.c -o mmu/mmu.o $(CXXFLAGS)
+
+io/via_keyb.o: io/via_keyb.c
+	$(CPP) -c io/via_keyb.c -o io/via_keyb.o $(CXXFLAGS)
+
+io/via_hdd.o: io/via_hdd.c
+	$(CPP) -c io/via_hdd.c -o io/via_hdd.o $(CXXFLAGS)
+
+disk/disk_image.o: disk/disk_image.c
+	$(CPP) -c disk/disk_image.c -o disk/disk_image.o $(CXXFLAGS)
+
+disk/disk_ctrl.o: disk/disk_ctrl.c
+	$(CPP) -c disk/disk_ctrl.c -o disk/disk_ctrl.o $(CXXFLAGS)
+
+debug/trace.o: debug/trace.c
+	$(CPP) -c debug/trace.c -o debug/trace.o $(CXXFLAGS)
+
+cpu/m68kcpu.o: cpu/m68kcpu.c
+	$(CPP) -c cpu/m68kcpu.c -o cpu/m68kcpu.o $(CXXFLAGS)
+
+cpu/m68kops.o: cpu/m68kops.c
+	$(CPP) -c cpu/m68kops.c -o cpu/m68kops.o $(CXXFLAGS)
+
+cpu/m68kopnz.o: cpu/m68kopnz.c
+	$(CPP) -c cpu/m68kopnz.c -o cpu/m68kopnz.o $(CXXFLAGS)
+
+cpu/m68kopdm.o: cpu/m68kopdm.c
+	$(CPP) -c cpu/m68kopdm.c -o cpu/m68kopdm.o $(CXXFLAGS)
+
+cpu/m68kopac.o: cpu/m68kopac.c
+	$(CPP) -c cpu/m68kopac.c -o cpu/m68kopac.o $(CXXFLAGS)
+
+io/via.o: io/via.c
+	$(CPP) -c io/via.c -o io/via.o $(CXXFLAGS)
+
+time/timer.o: time/timer.c
+	$(CPP) -c time/timer.c -o time/timer.o $(CXXFLAGS)
+
+irq/irq.o: irq/irq.c
+	$(CPP) -c irq/irq.c -o irq/irq.o $(CXXFLAGS)
+
+io/8530scc.o: io/8530scc.c
+	$(CPP) -c io/8530scc.c -o io/8530scc.o $(CXXFLAGS)
+	
