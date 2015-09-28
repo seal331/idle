@@ -387,10 +387,10 @@ int sdl2lisa_scancode(SDLKey key,unsigned char lisaMode)
                            else
                              m68k_set_irq(M68K_IRQ_NONE);
                           break;
-           case SDLK_F11: if (lisaMode)
+           case SDLK_F10: if (lisaMode)
                               via_keyb_power_off();
                          break;
-           case SDLK_F10 : if (lisaMode) {
+           case SDLK_F9 : if (lisaMode) {
                              IDLE_TRACE("Interrupt 6");
                              m68k_set_irq(M68K_IRQ_6);
                              }
@@ -415,7 +415,7 @@ int sdl2lisa_scancode(SDLKey key,unsigned char lisaMode)
            case SDLK_F5 :lkey=0x7C;
                         break;
 
-           case SDLK_F9 : loop_exit=1;
+           case SDLK_F8 : loop_exit=1;
            // under allegro this will cause program end
            // case KEY_ESC : loop_exit=1;
            
@@ -565,6 +565,10 @@ int redraw_lisa(int redraw_all)
                 mask=mask>>1;
             }
         }
+          for (x=0;x<23;x++)
+              for (y=0;y<12;y++) {
+                dirty_rect[x][y]=1;
+              }
      }
 
           for (x=0;x<23;x++)
@@ -583,6 +587,25 @@ int redraw_lisa(int redraw_all)
               }
         lisa_screen_cur=lisa_screen_next;
         lisa_screen_next=(lisa_screen_cur+1)&1;
+}
+void
+toggleFullScreen(void) {
+    static int full=0;
+    if (full==0) {
+        screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT|SDL_FULLSCREEN);
+        if (screen==NULL) {
+            screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+        }
+	    SDLGui_SetScreen(screen);
+	    full=1;
+    } else {
+        screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+        if (screen==NULL) {
+            exit (1);
+        }
+	    SDLGui_SetScreen(screen);
+	    full=0;
+    }
 }
 
 void
@@ -645,6 +668,13 @@ lisa_loop(uint32 targetPC)
 				case SDL_QUIT:
 					return 1;
 				case SDL_KEYDOWN:
+				    if (event.key.keysym.sym==SDLK_F11) {
+				        toggleFullScreen();
+				        redraw_lisa(1);
+				        break;
+				    }
+				    handleSdlKeyEvent(&event);
+				    break;
 				case SDL_KEYUP:
 				    handleSdlKeyEvent(&event);
 				    break;
