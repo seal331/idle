@@ -493,13 +493,13 @@ static SDL_Surface *lisa_screen[2];
 static int lisa_screen_cur=0;
 static int lisa_screen_next=1;
 static int screen_line;
+
+static int black,white; // should be in lisa screen color space
      
 void redraw_lisa_byte(uint32 video_offset) {
      int y,x,xx;
      uint8* video=getVideoMemory();
      int mask;
-	 int black=SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
-	 int white=SDL_MapRGB(screen->format, 0xff, 0xff, 0xff);
      
      x=video_offset%90;
      y=video_offset/90;
@@ -538,12 +538,12 @@ int redraw_lisa(int redraw_all)
     int y,x,xx;
     uint8* video=getVideoMemory();
     int mask;
-	 int black=SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
-	 int white=SDL_MapRGB(screen->format, 0xff, 0xff, 0xff);
     if (first)
     {
          lisa_screen[0]=SDL_CreateRGBSurface(0,720,364,32,0,0,0,0);
          lisa_screen[1]=SDL_CreateRGBSurface(0,720,364,32,0,0,0,0);
+	     black=SDL_MapRGB(lisa_screen[0]->format, 0x00, 0x00, 0x00);
+	     white=SDL_MapRGB(lisa_screen[0]->format, 0xff, 0xff, 0xff);
          first=0;
     }
               
