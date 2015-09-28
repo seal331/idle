@@ -22,6 +22,7 @@ typedef unsigned long   uint32;
                              * expected behaviour) */
 
 #undef DEBUG                /* Debug */
+#define _NOLOG_
 
 #define _ACCURATE_TIMERS_
 // enables a "PC when address written" debug

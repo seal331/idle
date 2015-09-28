@@ -92,6 +92,10 @@ check_debug(char *func_name) {
 		return -1;
 }
 
+int
+do_notrace(char *fmt,...) {
+}
+
 // helper function to format messages
 int
 do_trace(char *fmt,...) {
