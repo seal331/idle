@@ -7,7 +7,7 @@
 #ifndef HATARI_SCANDIR_H
 #define HATARI_SCANDIR_H
 
-#include "config.h"
+//#include "config.h"
 #include <dirent.h>
 
 #ifdef QNX
@@ -16,12 +16,20 @@
 #define dirent direct
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if !HAVE_ALPHASORT
-extern int alphasort(const dirent *d1, const dirent *d2);
+extern int alphasort(const void *d1, const void *d2);
 #endif
 
 #if !HAVE_SCANDIR
 extern int scandir(const char *dirname, struct dirent ***namelist, int (*sdfilter)(struct dirent *), int (*dcomp)(const void *, const void *));
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* HATARI_SCANDIR_H */

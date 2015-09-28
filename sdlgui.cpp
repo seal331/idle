@@ -20,7 +20,13 @@ int sdlgui_fontheight;	/* Height of the actual font */
 #include "font5x8.h"
 #include "font10x16.h"
 
+#if defined(WIN32)
+#define PATHSEP '\\'
+#else
 #define PATHSEP '/'
+#endif
+
+
 char bQuitProgram=0;
 
 static SDL_Surface *pSdlGuiScrn;            /* Pointer to the actual main SDL screen surface */
@@ -701,7 +707,7 @@ int SDLGui_DoDialog(SGOBJ *dlg, SDL_Event *pEventOut)
 		fprintf(stderr, "Screen size too small for dialog!\n");
 		return SDLGUI_ERROR;
 	}
-
+    bQuitProgram = false;
 	grey = SDL_MapRGB(pSdlGuiScrn->format,181,183,170);
 
 	dlgrect.x = dlg[0].x * sdlgui_fontwidth;

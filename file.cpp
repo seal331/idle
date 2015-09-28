@@ -25,7 +25,11 @@ const char File_fileid[] = "Hatari file.c : " __DATE__ " " __TIME__;
 
 #include "file.h"
 
+#if defined(WIN32)
+#define PATHSEP '\\'
+#else
 #define PATHSEP '/'
+#endif
 
 #if defined(WIN32)
 #define ftello ftell

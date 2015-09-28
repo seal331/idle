@@ -12,14 +12,17 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-//#include "main.h"
 #include "scandir.h"
 #include "sdlgui.h"
 #include "file.h"
 #include "paths.h"
-//#include "zip.h"
 
+#if defined(WIN32)
+#define PATHSEP '\\'
+#else
 #define PATHSEP '/'
+#endif
+
 
 #define SGFS_NUMENTRIES   16            /* How many entries are displayed at once */
 

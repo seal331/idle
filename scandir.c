@@ -8,6 +8,8 @@
 */
 const char ScanDir_fileid[] = "Hatari scandir.c : " __DATE__ " " __TIME__;
 
+#include "scandir.h"
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,8 +17,6 @@ const char ScanDir_fileid[] = "Hatari scandir.c : " __DATE__ " " __TIME__;
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-
-#include "scandir.h"
 
 /*-----------------------------------------------------------------------
  * Here come alphasort and scandir for POSIX-like OSes
@@ -55,7 +55,7 @@ int alphasort(const void *d1, const void *d2)
  * Scan a directory for all its entries
  * Return -1 on error, number of entries on success
  */
-int scandir(const char *dirname, struct dirent ***namelist, int (*sdfilter)(struct dirent *), int (*dcomp)(const void *, const void *))
+int scandir(const char *dirname, struct dirent ***namelist, int (*sdfilter)(struct dirent *), int (*dcomp)(dirent const*,dirent const*))
 {
 	struct dirent *d, *p = NULL, **names = NULL;
 	struct stat stb;
@@ -125,7 +125,7 @@ int scandir(const char *dirname, struct dirent ***namelist, int (*sdfilter)(stru
 	closedir(dirp);
 
 	if (nitems && dcomp != NULL)
-		qsort(names, nitems, sizeof(struct dirent *), dcomp);
+		qsort(names, nitems, sizeof(struct dirent *), (int (*)(const void*, const void*)) dcomp);
 
 	*namelist = names;
 
@@ -160,7 +160,7 @@ error_out:
 /**
  * Alphabetic order comparison routine.
  */
-int alphasort(const dirent *d1, const dirent *d2)
+int alphasort(const void *d1, const void *d2)
 {
 	return stricmp((*(struct dirent * const *)d1)->d_name, (*(struct dirent * const *)d2)->d_name);
 }
@@ -293,7 +293,7 @@ int scandir(const char *dirname, struct dirent ***namelist, int (*sdfilter)(stru
 #endif
 
 	if (dcomp)
-		qsort (dir, nDir, sizeof(*dir),dcomp);
+		qsort (dir, nDir, sizeof(*dir),(int (*)(const void*, const void*)) dcomp);
 
 	*namelist = dir;
 	return nDir;

@@ -853,7 +853,7 @@ my_sdl_alert2(char *message,char *but1,char *but2) {
 }
 
 
-int main() {
+int main(int argc,char ** argv) {
     char buf[256];
     int line;
     char *err;
