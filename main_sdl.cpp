@@ -39,8 +39,9 @@
 #include <SDL.h>
 #include "sdlgui.h"
 
+const SDL_VideoInfo* videoInfo;
 SDL_Surface *screen;
-
+static int g_isConsole=0;
  
 #include <stdio.h>
 #include <stdlib.h>
@@ -890,8 +891,16 @@ int main(int argc,char ** argv) {
     int ret;
     int revision;
     int doQuit;
+    int argnum;
     IDLE_INIT_FUNC("main()");
 	// init();
+
+    for (argnum=1;argnum<argc;argnum++) {
+        if (strcmp(argv[argnum],"-console")==0) {
+            g_isConsole=1;
+        }
+    }
+    
 
     /* Initialize defaults, Video and Audio */
     if((SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO)==-1)) { 
@@ -899,7 +908,13 @@ int main(int argc,char ** argv) {
         exit(-1);
     }	
 
-    screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+    videoInfo = SDL_GetVideoInfo ();
+
+    if (g_isConsole) {
+        screen = SDL_SetVideoMode(videoInfo->current_w, videoInfo->current_h, videoInfo->vfmt->BitsPerPixel, SDL_SWSURFACE|SDL_ANYFORMAT);
+    } else {
+        screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+    }
     if ( screen == NULL ) {
         fprintf(stderr, "Couldn't set 640x480x8 video mode: %s\n",
                         SDL_GetError());
