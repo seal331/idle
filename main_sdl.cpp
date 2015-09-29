@@ -602,6 +602,7 @@ toggleFullScreen(void) {
     } else {
         screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
         if (screen==NULL) {
+            SDL_Quit();
             exit (1);
         }
 	    SDLGui_SetScreen(screen);
@@ -916,7 +917,7 @@ int main(int argc,char ** argv) {
         screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
     }
     if ( screen == NULL ) {
-        fprintf(stderr, "Couldn't set 640x480x8 video mode: %s\n",
+        fprintf(stderr, "Couldn't set video mode: %s\n",
                         SDL_GetError());
         exit(1);
     }
@@ -937,6 +938,7 @@ int main(int argc,char ** argv) {
 	
     if ((err=MemInit(ret))!=NULL) {
         my_sdl_alert1(err,"Quit");
+        SDL_Quit();
         exit (1);
     }
 
@@ -970,7 +972,7 @@ int main(int argc,char ** argv) {
     	    doQuit=1;
     	}
     }
-        
+    SDL_Quit();
 	deinit();
 	return 0;
 }
