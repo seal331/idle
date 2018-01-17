@@ -1,17 +1,17 @@
-CPP  = i586-mingw32msvc-g++ -D__DEBUG__
-CC   = i586-mingw32msvc-gcc -D__DEBUG__
+CPP  = i686-w64-mingw32-g++ -D__DEBUG__
+CC   = i686-w64-mingw32-gcc -D__DEBUG__
 OBJ  = main_sdl.o sdlgui.o dlgFileSelect.o scandir.o file.o cpu/debug.o mmu/mmu.o io/via_keyb.o io/via_hdd.o disk/disk_image.o disk/disk_ctrl.o debug/trace.o cpu/m68kcpu.o cpu/m68kops.o cpu/m68kopnz.o cpu/m68kopdm.o cpu/m68kopac.o io/via.o time/timer.o irq/irq.o io/8530scc.o
 LINKOBJ  = main_sdl.o sdlgui.o dlgFileSelect.o scandir.o file.o cpu/debug.o mmu/mmu.o io/via_keyb.o io/via_hdd.o disk/disk_image.o disk/disk_ctrl.o debug/trace.o cpu/m68kcpu.o cpu/m68kops.o cpu/m68kopnz.o cpu/m68kopdm.o cpu/m68kopac.o io/via.o time/timer.o irq/irq.o io/8530scc.o
 
 
-LIBS = -L/home/gilles/projects/SDL-1.2.15_mingw32/lib -lmingw32 -lSDLmain -lSDL
+LIBS = -L/home/gilles/SDL-1.2.15_mingw32/lib -lmingw32 -lSDLmain -lSDL
 
 
 INCS =   
 CXXINCS =  
 BIN  = idle_win32.exe
-CXXFLAGS = $(CXXINCS) -I/home/gilles/projects/SDL-1.2.15_mingw32/include/SDL
-CFLAGS = $(INCS) -I/home/gilles/projects/SDL-1.2.15_mingw32/include/SDL
+CXXFLAGS = $(CXXINCS) -I/home/gilles/SDL-1.2.15_mingw32/include/SDL
+CFLAGS = $(INCS) -I/home/gilles/SDL-1.2.15_mingw32/include/SDL
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom
