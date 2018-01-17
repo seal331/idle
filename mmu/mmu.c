@@ -29,6 +29,7 @@ static char     sccsid[] = "$Id: mmu.c,v 1.25 2008/04/09 20:53:26 gilles_fetis E
 
 #include "../cpu/debug.h"
 
+
 // the ROM and RAM spaces
 uint8           *ramBase, *romBase, *videoRomBase;
 uint8           *ramErrors;
@@ -129,7 +130,12 @@ INLINE void set_parity(int physaddress) {
 
 static int redraw_dirty;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void redraw_lisa_byte(uint32 video_offset);
+
 
 INLINE void check_redraw_byte(int physaddress) {
        int delta=physaddress-videoADDR15;
@@ -155,6 +161,9 @@ int must_redraw(void) {
     }
     return 0;
 }
+#ifdef __cplusplus
+}
+#endif
 
 void refresh_mmu_box(void)
 {
@@ -1296,3 +1305,5 @@ void m68k_write_memory_16(unsigned int address, unsigned int value){
 void m68k_write_memory_32(unsigned int address, unsigned int value){
          LisaSetL(address,(uint32) value);
 }
+
+

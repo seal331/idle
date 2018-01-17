@@ -34,6 +34,10 @@
 
 #include "../config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern uint32 clock68k;
 
 void registerIoFunc(uint32 address,void (*func)(int*,int,int));
@@ -51,3 +55,7 @@ void mmuReset(void);
 void refresh_mmu_box(void);
 char *get_address_info_phys(uint32 address);
 char *get_address_info_mmu(uint32 mmu_address);
+
+#ifdef __cplusplus
+}
+#endif

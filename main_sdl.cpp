@@ -496,7 +496,12 @@ static int lisa_screen_next=1;
 static int screen_line;
 
 static int black,white; // should be in lisa screen color space
-     
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void redraw_lisa_byte(uint32 video_offset);     
 void redraw_lisa_byte(uint32 video_offset) {
      int y,x,xx;
      uint8* video=getVideoMemory();
@@ -529,6 +534,9 @@ void redraw_lisa_byte(uint32 video_offset) {
              mask=mask>>1;
          }         
 }
+#ifdef __cplusplus
+}
+#endif
 
 int redraw_lisa(int redraw_all)
 {
