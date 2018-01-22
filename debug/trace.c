@@ -153,6 +153,7 @@ do_trace(char *fmt,...) {
 #ifdef _TRACE_LOG_FILE_
 	fprintf(log,trace_out);
 	fprintf(log,"\n");
+	fflush(log);
 #endif
 	trace_log_tab[trace_log_next*LOG_LINE_SIZE+LOG_LINE_SIZE-1]='\0';
 	trace_log_next=(trace_log_next+1)%LOG_NB_LINES;

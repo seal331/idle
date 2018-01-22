@@ -63,6 +63,9 @@ static int g_isConsole=0;
 int ask_bkpt=0;
 static int exact=1;
 
+// make local for gui to adapt
+static int revision;
+
 #define PC_DEBUG_SIZE 8
 uint32 pc_debug[PC_DEBUG_SIZE];
 int last_pc_debug=0;
@@ -80,23 +83,24 @@ int my_sdl_alert2(char *message,char *but1,char *but2);
 
 char debug_str[6*4+1];
 
-/*
+
 int quit(void)
 {
-   if (alert("Really Quit?", NULL, NULL, "&Yes", "&No", 'y', 'n') == 1)
-      return D_CLOSE;
+   if (my_sdl_alert2("Really Quit?", "Yes", "No") == 0)
+      return 0;
    else
-      return D_REDRAW;
+      return 1;
 }
+
 
 int reset_or_turnout(void)
 {
-   if (alert("What to do?", NULL, NULL, "&RESET", "&Turn Off", 'R', 'T') == 1)
-      return D_CLOSE;
+   if (my_sdl_alert2("What to do?", "RESET", "Turn Off") == 0)
+      return 0;
    else
-      return D_REDRAW;
+      return 1;
 }
-*/
+
 
 char log_box_init[0x10000];
 
@@ -248,6 +252,9 @@ int
 popup_menu() {
 	int ret;
 	
+	if (revision==0xA8) {
+		popupdlg[1].txt="<void>";
+	}
 	SDLGui_CenterDlg(popupdlg);
 	ret = SDLGui_DoDialog(popupdlg, NULL);
 	switch (ret) {
@@ -266,10 +273,16 @@ popup_menu() {
 		    return 0;	
 		    break;
     	case 5:
+                 if   (reset_or_turnout()==0)
+                      lisa_reset();
+                 else
+                     via_keyb_power_off();
 		    return 0;	
 		    break;
     	case 6:
+                if (quit()==0) {
 		    return 1;	
+	}
 		    break;
     	case 7:
 		    return 0;	
@@ -642,7 +655,7 @@ Uint32 time_left(void)
     if(next_time <= now)
         return 0;
     else
-        return next_time - now;
+        return (next_time - now);
 }
 
 int 
@@ -797,7 +810,7 @@ lisa_loop(uint32 targetPC)
               lastvbl=vbl;
 				SDL_Flip(screen);
 			SDL_Delay(time_left());
-			next_time += TICK_INTERVAL;
+			next_time += TICK_INTERVAL/((exact==1)?1:4);
           } // while (!loop_exit);
           
 end:
@@ -859,19 +872,20 @@ int
 my_sdl_alert1(char *message,char *but1) {
 	int ret;
 	alertdlg1[1].txt=message;
+	alertdlg1[1].w=strlen(message);
 	alertdlg1[2].txt=but1;
 
 	
 	SDLGui_CenterDlg(alertdlg1);
 	ret = SDLGui_DoDialog(alertdlg1, NULL);
-	//printf("ret=%d\n",ret-1);
-	return ret-1;
+	// printf("ret=%d\n",ret-2);
+	return ret-2;
 }
 
 
 static SGOBJ alertdlg2[] =
 {
-	{ SGBOX, 0, 0, 0,0, 25,8, NULL },
+	{ SGBOX, 0, 0, 0,0, 30,8, NULL },
 	{ SGTEXT, 0, 0, 2,1, 16,1, "This is a question" },
 	{ SGBUTTON, 0, 0, 2,4, 13,1, "reply 1" },
 	{ SGBUTTON, 0, 0, 2,6, 13,1, "reply 2" },
@@ -883,13 +897,14 @@ int
 my_sdl_alert2(char *message,char *but1,char *but2) {
 	int ret;
 	alertdlg2[1].txt=message;
+	alertdlg2[1].w=strlen(message);
 	alertdlg2[2].txt=but1;
 	alertdlg2[3].txt=but2;
 	
 	SDLGui_CenterDlg(alertdlg2);
 	ret = SDLGui_DoDialog(alertdlg2, NULL);
-	//printf("ret=%d\n",ret-1);
-	return ret-1;
+	// printf("ret=%d\n",ret-2);
+	return ret-2;
 }
 
 
@@ -898,7 +913,8 @@ int main(int argc,char ** argv) {
     int line;
     char *err;
     int ret;
-    int revision;
+
+    int model;
     int doQuit;
     int argnum;
     IDLE_INIT_FUNC("main()");
@@ -938,13 +954,17 @@ int main(int argc,char ** argv) {
         
 	ret=my_sdl_alert2("Which model?","Lisa1","Lisa2");
 	
-	if (ret==1) {
+	if (ret==0) {
+		// lisa 1
 	    revision=0x40;
+	    model=1;
 	} else {
+		// lisa 2
 	    revision=0xA8;
+	    model=0;
 	}
 	
-    if ((err=MemInit(ret))!=NULL) {
+    if ((err=MemInit(model))!=NULL) {
         my_sdl_alert1(err,"Quit");
         SDL_Quit();
         exit (1);
@@ -953,7 +973,7 @@ int main(int argc,char ** argv) {
 	IDLE_WARN("Init via1");
     init_via_keyb_io();
     if (check_profile_image()==-1) {
-        if (my_sdl_alert2("Profile not init should I create 5 or 10Mb","5 Mb","10 Mb")==1)
+        if (my_sdl_alert2("Profile not init should I create 5 or 10Mb","5 Mb","10 Mb")==0)
                 init_via_hdd_io(0);
         else
                 init_via_hdd_io(1);
@@ -990,5 +1010,10 @@ void deinit() {
 //	clear_keybuf();
 	/* add other deinitializations here */
 }
+
+//======================================================================================
+// SDL debugger
+
+
 
 

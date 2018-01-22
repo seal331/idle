@@ -1647,6 +1647,28 @@ INLINE void m68ki_stack_frame_buserr(uint sr)
     IDLE_DEBUG("NEW STACK x%08x",REG_SP);
 }
 
+/* Bus error stack frame (68000 only).
+ */
+INLINE void m68ki_stack_frame_aerr(uint sr)
+{
+    uint32 stacked_pc;
+    IDLE_INIT_FUNC("m68ki_stack_frame_aerr()");
+	stacked_pc=(REG_PC)&CPU_ADDRESS_MASK;
+    	m68ki_push_32(stacked_pc);IDLE_TRACE("stacking PC x%08x",stacked_pc);
+	m68ki_push_16(sr);IDLE_DEBUG("stacking SR x%04x",sr);
+	m68ki_push_16(REG_IR);IDLE_DEBUG("stacking IR x%04x",REG_IR);
+	m68ki_push_32(m68ki_aerr_address);	/* access address */
+	IDLE_TRACE("stacking AERR x%08x",m68ki_aerr_address);
+	/* 0 0 0 0 0 0 0 0 0 0 0 R/W I/N FC
+	 * R/W  0 = write, 1 = read
+	 * I/N  0 = instruction, 1 = not
+	 * FC   3-bit function code
+	 */
+	m68ki_push_16(m68ki_aerr_write_mode | CPU_INSTR_MODE | m68ki_aerr_fc);
+	IDLE_DEBUG("stacking INFO x%04x",m68ki_aerr_write_mode | CPU_INSTR_MODE | m68ki_aerr_fc);
+    IDLE_DEBUG("NEW STACK x%08x",REG_SP);
+}
+
 /* Format 8 stack frame (68010).
  * 68010 only.  This is the 29 word bus/address error frame.
  */
@@ -1983,7 +2005,7 @@ INLINE void m68ki_exception_address_error(void)
 
 	sr = m68ki_init_exception();
 
-    IDLE_TRACE("Offending instruction address error x%06x",REG_PPC);
+    IDLE_TRACE("Offending instruction address error x%06x adr=x%06x",REG_PPC,m68ki_aerr_address);
     
 	/* If we were processing a bus error, address error, or reset,
 	 * this is a catastrophic failure.
@@ -2001,14 +2023,14 @@ INLINE void m68ki_exception_address_error(void)
 	CPU_RUN_MODE = RUN_MODE_AERR_RESET;
 
 	/* Note: This is implemented for 68000 only! */
-	m68ki_stack_frame_buserr(sr);
+	m68ki_stack_frame_aerr(sr);
 
 	m68ki_jump_vector(EXCEPTION_ADDRESS_ERROR);
 
 	/* Use up some clock cycles and undo the instruction's cycles */
 	USE_CYCLES(CYC_EXCEPTION[EXCEPTION_ADDRESS_ERROR] - CYC_INSTRUCTION[REG_IR]);
 
-	IDLE_TRACE("should longjump...");
+	IDLE_TRACE("Address error...");
 	// no longjump here as it is in the macro...
 }
 
