@@ -34,6 +34,7 @@
    13/07/2007   _ XENIX working (without hang)
    xx/09/2015   _ twiggy support
    24/09/2015   _ adding SDL1.x + hatari/aranym gui support (replaces allegro4)
+   21/01/2017   _ more SDL and speedup
  */
 
 #include <SDL.h>
@@ -57,6 +58,14 @@ static int g_isConsole=0;
 #include "disk/disk_ctrl.h"
 #include "time/timer.h"
 #include "irq/irq.h"
+
+
+#if defined(WIN32)
+#define PATHSEP '\\'
+#else
+#define PATHSEP '/'
+#endif
+
 
 // #include "debug/mem_explorer.h"
 
@@ -401,9 +410,11 @@ int sdl2lisa_scancode(SDLKey key,unsigned char lisaMode)
                            else
                              m68k_set_irq(M68K_IRQ_NONE);
                           break;
-           case SDLK_F10: if (lisaMode)
+           case SDLK_F10: if (lisaMode) {
                               via_keyb_power_off();
-                         break;
+				IDLE_TRACE("POWERING OFF !!!!!!!");
+			}
+		   break;
            case SDLK_F9 : if (lisaMode) {
                              IDLE_TRACE("Interrupt 6");
                              m68k_set_irq(M68K_IRQ_6);
@@ -415,9 +426,11 @@ int sdl2lisa_scancode(SDLKey key,unsigned char lisaMode)
            
            case SDLK_F1 : exact=0;
                        lkey=0x5c;
+			IDLE_TRACE("FAST mode");
                        break;
            case SDLK_F2 : exact=1;
                          lkey=0x5c;
+			IDLE_TRACE("EXACT mode");
                         break;
 
            case SDLK_F3 :lkey=0x48;
@@ -810,7 +823,7 @@ lisa_loop(uint32 targetPC)
               lastvbl=vbl;
 				SDL_Flip(screen);
 			SDL_Delay(time_left());
-			next_time += TICK_INTERVAL/((exact==1)?1:4);
+			next_time += TICK_INTERVAL/((exact==1)?1:8);
           } // while (!loop_exit);
           
 end:
@@ -840,21 +853,38 @@ int lisa_reset(void)
 
 int insert_dc42_image(int slot)
 {
-    char path[6*1024];
+    static int first=1;
+    static char path[6*1024];
     char* pt_path=path;
     int ret;
     char *retPath;
+    int i;
 
     IDLE_INIT_FUNC("insert_dc42_image()");
 
-    path[0]='\0';
-    
+    if (first==1) {
+        path[0]='\0';
+        first=0;
+    } 
+
     retPath=SDLGui_FileSelect(pt_path,NULL,0);
                            
     IDLE_TRACE("File name :<%s>",retPath);
                            
     ret=dc42_insert(retPath,slot);
-    if (ret!=0) my_sdl_alert1("Bad DC42 image disk" ,"OK");
+    if (ret!=0) {
+	 my_sdl_alert1("Bad DC42 image disk" ,"OK");
+         return -1;
+    }
+  
+    // keep last path of good image (may help for multidisk)
+    strcpy(path,retPath);
+    for (i=strlen(path)-1;i>=0;i--) {
+ 	if (path[i]==PATHSEP) {
+	   path[i]='\0';
+	   break;
+	}
+    }
    
     return 0;
 }
@@ -961,7 +991,7 @@ int main(int argc,char ** argv) {
 	} else {
 		// lisa 2
 	    revision=0xA8;
-	    model=0;
+	    model=2;
 	}
 	
     if ((err=MemInit(model))!=NULL) {
