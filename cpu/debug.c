@@ -1161,6 +1161,21 @@ char *GetStatus(void)
      return status_str;        
 }
 
+
+void dump_regs(void) {
+     IDLE_INIT_FUNC("dump_regs()");
+     IDLE_TRACE("PC=x%08X SR=%s",get_pc,GetStatus());
+     IDLE_TRACE("D0=x%08X A0=x%08X",m68k_get_reg(NULL,M68K_REG_D0),m68k_get_reg(NULL,M68K_REG_A0));
+     IDLE_TRACE("D1=x%08X A1=x%08X",m68k_get_reg(NULL,M68K_REG_D1),m68k_get_reg(NULL,M68K_REG_A1));
+     IDLE_TRACE("D2=x%08X A2=x%08X",m68k_get_reg(NULL,M68K_REG_D2),m68k_get_reg(NULL,M68K_REG_A2));
+     IDLE_TRACE("D3=x%08X A3=x%08X",m68k_get_reg(NULL,M68K_REG_D3),m68k_get_reg(NULL,M68K_REG_A3));
+     IDLE_TRACE("D4=x%08X A4=x%08X",m68k_get_reg(NULL,M68K_REG_D4),m68k_get_reg(NULL,M68K_REG_A4));
+     IDLE_TRACE("D5=x%08X A5=x%08X",m68k_get_reg(NULL,M68K_REG_D5),m68k_get_reg(NULL,M68K_REG_A5));
+     IDLE_TRACE("D6=x%08X A6=x%08X",m68k_get_reg(NULL,M68K_REG_D6),m68k_get_reg(NULL,M68K_REG_A6));
+     IDLE_TRACE("D7=x%08X A7=x%08X",m68k_get_reg(NULL,M68K_REG_D7),m68k_get_reg(NULL,M68K_REG_A7));
+     IDLE_TRACE("CPU_MODE=x%x  STOPPED=x%X",m68k_get_reg(NULL,M68K_REG_CPU_RUN_MODE),m68k_get_reg(NULL,M68K_REG_CPU_STOPPED));
+}
+
 char* unassemble_addr(uint32 addr) {
           uint32 l_pc=addr;
           uint16 l_inststream[256];
