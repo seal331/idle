@@ -75,7 +75,7 @@ static int exact=1;
 // make local for gui to adapt
 static int revision;
 
-#define PC_DEBUG_SIZE 8
+#define PC_DEBUG_SIZE 256
 uint32 pc_debug[PC_DEBUG_SIZE];
 int last_pc_debug=0;
 
@@ -92,6 +92,17 @@ int my_sdl_alert2(char *message,char *but1,char *but2);
 
 char debug_str[6*4+1];
 
+// to use when you lose all hope
+void
+postMortem(void) {
+   int i;
+   IDLE_INIT_FUNC("postMortem()");
+   for (i=0;i<PC_DEBUG_SIZE;i++) {
+      IDLE_TRACE("%s",unassemble_addr(pc_debug[(last_pc_debug+i)%PC_DEBUG_SIZE]));
+   }
+      IDLE_TRACE("cur => %s",unassemble_addr(m68k_get_reg(NULL,M68K_REG_PPPC)));
+      IDLE_TRACE("next => %s",unassemble_addr(get_pc));
+}
 
 int quit(void)
 {
@@ -697,6 +708,7 @@ lisa_loop(uint32 targetPC)
 
      next_time = SDL_GetTicks() + TICK_INTERVAL;
 
+
      while (1) {
 		while ( SDL_PollEvent(&event) )
 		{
@@ -827,6 +839,8 @@ lisa_loop(uint32 targetPC)
           } // while (!loop_exit);
           
 end:
+      postMortem(); 
+      dump_regs();
       unscare_mouse();
       ask_bkpt=0;    
       // disass_debugger();

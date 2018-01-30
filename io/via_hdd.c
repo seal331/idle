@@ -55,7 +55,7 @@ uint8 via_hdd_irb=0xFE; // DF
 FILE *profile_file;
 static int profile_type;
 
-enum {READ,WRITE} profile_mode;
+// enum {READ,WRITE} profile_mode;
 
 uint8 profile_buffer[532];
 
@@ -771,5 +771,5 @@ void init_via_hdd_io(int profile_type_a)
         IDLE_TRACE("cannot create profile...");
         exit(1);
      }
-     profile_mode=WRITE;
+     // profile_mode=WRITE;
 }
