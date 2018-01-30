@@ -1135,7 +1135,7 @@ void m68k_op_adda_16_pi(void)
 {
 	uint* r_dst = &AX;
 
-	*r_dst = MASK_OUT_ABOVE_32(*r_dst + MAKE_INT_16(OPER_AY_PI_16()));
+	*r_dst = MASK_OUT_ABOVE_32(MAKE_INT_16(OPER_AY_PI_16()) + *r_dst);
 }
 
 
