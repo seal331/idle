@@ -72,6 +72,8 @@ static int g_isConsole=0;
 int ask_bkpt=0;
 static int exact=1;
 
+static int zoom=1;
+
 // make local for gui to adapt
 static int revision;
 
@@ -538,6 +540,15 @@ static int black,white; // should be in lisa screen color space
 extern "C" {
 #endif
 
+static inline void ZoomPutpixel(SDL_Surface* screen,int x,int y,int color) {
+	int i,j;
+	for (i=0;i<zoom;i++) {
+		for (j=0;j<zoom;j++) {
+               putpixel(screen,x+i,y+j,color);
+		}
+	}
+}
+
 void redraw_lisa_byte(uint32 video_offset);     
 void redraw_lisa_byte(uint32 video_offset) {
      int y,x,xx;
@@ -552,9 +563,9 @@ void redraw_lisa_byte(uint32 video_offset) {
         for (xx=0;xx<8;xx++)
         {
             if ((video[video_offset]&mask)==mask)
-               putpixel(lisa_screen[lisa_screen_cur],x*8+xx,y,black);
+               ZoomPutpixel(lisa_screen[lisa_screen_cur],(x*8+xx)*zoom,y*zoom,black);
                else
-               putpixel(lisa_screen[lisa_screen_cur],x*8+xx,y,white);
+               ZoomPutpixel(lisa_screen[lisa_screen_cur],(x*8+xx)*zoom,y*zoom,white);
              mask=mask>>1;
           }
         }     
@@ -565,9 +576,9 @@ void redraw_lisa_byte(uint32 video_offset) {
         for (xx=0;xx<8;xx++)
         {
             if ((video[video_offset]&mask)==mask)
-               putpixel(lisa_screen[lisa_screen_next],x*8+xx,y,black);
+               ZoomPutpixel(lisa_screen[lisa_screen_next],(x*8+xx)*zoom,y*zoom,black);
                else
-               putpixel(lisa_screen[lisa_screen_next],x*8+xx,y,white);
+               ZoomPutpixel(lisa_screen[lisa_screen_next],(x*8+xx)*zoom,y*zoom,white);
              mask=mask>>1;
          }         
 }
@@ -586,8 +597,8 @@ int redraw_lisa(int redraw_all)
     int mask;
     if (first)
     {
-         lisa_screen[0]=SDL_CreateRGBSurface(0,720,364,32,0,0,0,0);
-         lisa_screen[1]=SDL_CreateRGBSurface(0,720,364,32,0,0,0,0);
+         lisa_screen[0]=SDL_CreateRGBSurface(0,720*zoom,364*zoom,32,0,0,0,0);
+         lisa_screen[1]=SDL_CreateRGBSurface(0,720*zoom,364*zoom,32,0,0,0,0);
 	     black=SDL_MapRGB(lisa_screen[0]->format, 0x00, 0x00, 0x00);
 	     white=SDL_MapRGB(lisa_screen[0]->format, 0xff, 0xff, 0xff);
          first=0;
@@ -601,12 +612,12 @@ int redraw_lisa(int redraw_all)
             for (xx=0;xx<8;xx++)
             {
                 if ((video[x+y*90]&mask)==mask) {
-                   putpixel(lisa_screen[lisa_screen_cur],x*8+xx,y,black);
-                   putpixel(lisa_screen[lisa_screen_next],x*8+xx,y,black);
+                   ZoomPutpixel(lisa_screen[lisa_screen_cur],(x*8+xx)*zoom,y*zoom,black);
+                   ZoomPutpixel(lisa_screen[lisa_screen_next],(x*8+xx)*zoom,y*zoom,black);
                    }
                 else {
-                   putpixel(lisa_screen[lisa_screen_cur],x*8+xx,y,white);
-                   putpixel(lisa_screen[lisa_screen_next],x*8+xx,y,white);
+                   ZoomPutpixel(lisa_screen[lisa_screen_cur],(x*8+xx)*zoom,y*zoom,white);
+                   ZoomPutpixel(lisa_screen[lisa_screen_next],(x*8+xx)*zoom,y*zoom,white);
                 }
                 mask=mask>>1;
             }
@@ -620,10 +631,10 @@ int redraw_lisa(int redraw_all)
           for (x=0;x<23;x++)
               for (y=0;y<12;y++) {
                   if (dirty_rect[x][y]>0) {
-					rect.x=x*32;
-					rect.y=y*32;
-					rect.w=32;
-					rect.h=32;
+					rect.x=x*32*zoom;
+					rect.y=y*32*zoom;
+					rect.w=32*zoom;
+					rect.h=32*zoom;
 					SDL_BlitSurface(lisa_screen[lisa_screen_cur],&rect,screen,&rect);
                     if (dirty_rect[x][y]>1)
 						SDL_BlitSurface(lisa_screen[lisa_screen_next],&rect,lisa_screen[lisa_screen_cur],&rect);
@@ -634,18 +645,19 @@ int redraw_lisa(int redraw_all)
         lisa_screen_cur=lisa_screen_next;
         lisa_screen_next=(lisa_screen_cur+1)&1;
 }
+
+static int full=0;
 void
 toggleFullScreen(void) {
-    static int full=0;
     if (full==0) {
-        screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT|SDL_FULLSCREEN);
+        screen = SDL_SetVideoMode(720*zoom, 364*zoom, 0, SDL_SWSURFACE|SDL_ANYFORMAT|SDL_FULLSCREEN);
         if (screen==NULL) {
-            screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+            screen = SDL_SetVideoMode(720*zoom, 364*zoom, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
         }
 	    SDLGui_SetScreen(screen);
 	    full=1;
     } else {
-        screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+        screen = SDL_SetVideoMode(720*zoom, 364*zoom, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
         if (screen==NULL) {
             SDL_Quit();
             exit (1);
@@ -961,13 +973,26 @@ int main(int argc,char ** argv) {
     int model;
     int doQuit;
     int argnum;
-    IDLE_INIT_FUNC("main()");
+    //IDLE_INIT_FUNC("main()");
 	// init();
 
     for (argnum=1;argnum<argc;argnum++) {
         if (strcmp(argv[argnum],"-console")==0) {
             g_isConsole=1;
         }
+        if (strcmp(argv[argnum],"-z1")==0) {
+            zoom=1;
+        }
+        if (strcmp(argv[argnum],"-z2")==0) {
+            zoom=2;
+        }
+        if (strcmp(argv[argnum],"-z3")==0) {
+            zoom=3;
+        }
+        if (strcmp(argv[argnum],"-v")==0) {
+            init_trace(stdout);
+        }
+        
     }
     
 
@@ -982,7 +1007,7 @@ int main(int argc,char ** argv) {
     if (g_isConsole) {
         screen = SDL_SetVideoMode(videoInfo->current_w, videoInfo->current_h, videoInfo->vfmt->BitsPerPixel, SDL_SWSURFACE|SDL_ANYFORMAT);
     } else {
-        screen = SDL_SetVideoMode(720, 364, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+        screen = SDL_SetVideoMode(720*zoom, 364*zoom, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
     }
     if ( screen == NULL ) {
         fprintf(stderr, "Couldn't set video mode: %s\n",
@@ -1014,7 +1039,6 @@ int main(int argc,char ** argv) {
         exit (1);
     }
 
-	IDLE_WARN("Init via1");
     init_via_keyb_io();
     if (check_profile_image()==-1) {
         if (my_sdl_alert2("Profile not init should I create 5 or 10Mb","5 Mb","10 Mb")==0)
@@ -1043,6 +1067,9 @@ int main(int argc,char ** argv) {
     	if (popup_menu()==1) {
     	    doQuit=1;
     	}
+    }
+    if (full) {
+	toggleFullScreen();
     }
     SDL_Quit();
 	deinit();

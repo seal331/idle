@@ -24,7 +24,7 @@ no_trace(void);
 void
 restore_trace(void);
 int
-init_trace(void);
+init_trace(FILE *f);
 void 
 clear_log_str(void);
 int

@@ -22,7 +22,7 @@ char * trace_log_tab;
 static int trace_log_next=0;
 static int trace_log_size=0;
 
-static FILE* log;
+static FILE* log=NULL;
 
 int g_notrace=0;
 
@@ -43,7 +43,7 @@ clear_log_str(void) {
 }
 
 int
-init_trace(void) {
+init_trace(FILE * logStream) {
 	trace_log_tab=(char *)malloc(LOG_LINE_SIZE*LOG_NB_LINES);
 	memset(trace_log_tab,LOG_LINE_SIZE*LOG_NB_LINES,'\0');
 	trace_init_flag=1;
@@ -65,24 +65,21 @@ init_trace(void) {
 			fclose(f);
 		}
 	}
-#ifdef _TRACE_LOG_FILE_
-	log=fopen("trace.log","w");
-#endif
+	if (logStream!=NULL) {
+		log=logStream;
+	}
 }
 
 int
 deinit_trace(void) {
 	if (trace_init_flag) free(trace_log_tab);
-#ifdef _TRACE_LOG_FILE_
-    fclose(log);
-#endif
 }
 
 // utility func 
 int 
 check_debug(char *func_name) {
 		int i;
-		if (!trace_init_flag) init_trace();
+		if (!trace_init_flag) init_trace(NULL);
 		for (i=0;i<debug_func_list_size;i++)
 		{
 			// function is to debug
@@ -150,11 +147,11 @@ do_trace(char *fmt,...) {
 	va_end(list);
 	// update the log (cycle buffer)
 	strncpy(&trace_log_tab[trace_log_next*LOG_LINE_SIZE],trace_out,LOG_LINE_SIZE);
-#ifdef _TRACE_LOG_FILE_
-	fprintf(log,trace_out);
-	fprintf(log,"\n");
-	fflush(log);
-#endif
+	if (log!=NULL) {
+		fprintf(log,trace_out);
+		fprintf(log,"\n");
+		fflush(log);
+	}
 	trace_log_tab[trace_log_next*LOG_LINE_SIZE+LOG_LINE_SIZE-1]='\0';
 	trace_log_next=(trace_log_next+1)%LOG_NB_LINES;
 	if (trace_log_size<LOG_NB_LINES) trace_log_size++;
