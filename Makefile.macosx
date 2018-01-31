@@ -1,5 +1,5 @@
-CPP  = g++ -D__DEBUG__ -I/Library/Frameworks/SDL.framework/Headers -framework SDL -framework Cocoa
-CC   = gcc -D__DEBUG__ -I/Library/Frameworks/SDL.framework/Headers -framework SDL -framework Cocoa
+CPP  = g++ -D__DEBUG__ -arch ppc -arch x86_64 -I/Library/Frameworks/SDL.framework/Headers -framework SDL -framework Cocoa
+CC   = gcc -D__DEBUG__ -arch ppc -arch x86_64 -I/Library/Frameworks/SDL.framework/Headers -framework SDL -framework Cocoa
 OBJ  = SDLMain.o main_sdl.o sdlgui.o dlgFileSelect.o scandir.o file.o cpu/debug.o mmu/mmu.o io/via_keyb.o io/via_hdd.o disk/disk_image.o disk/disk_ctrl.o debug/trace.o cpu/m68kcpu.o cpu/m68kops.o cpu/m68kopnz.o cpu/m68kopdm.o cpu/m68kopac.o io/via.o time/timer.o irq/irq.o io/8530scc.o
 LINKOBJ  = SDLMain.o main_sdl.o sdlgui.o dlgFileSelect.o scandir.o file.o cpu/debug.o mmu/mmu.o io/via_keyb.o io/via_hdd.o disk/disk_image.o disk/disk_ctrl.o debug/trace.o cpu/m68kcpu.o cpu/m68kops.o cpu/m68kopnz.o cpu/m68kopdm.o cpu/m68kopac.o io/via.o time/timer.o irq/irq.o io/8530scc.o
 
