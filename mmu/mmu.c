@@ -39,7 +39,7 @@ uint32           *pcWhenWrite;
 uint32           *addrWhenWrite;
 #endif
 
-static int ReadWildIOBERR=1;
+static int WriteWildIOBERR=1;
 
 // the MMU description
 static int mmuSTART;
@@ -304,7 +304,7 @@ void accessIo(uint32 address,int *ioval,int rwMode,int size)
              {
               // mark bus timeout in status
                     mmuSTATUS&=(~8); 
-		    if (ReadWildIOBERR!=0) {
+		    if (WriteWildIOBERR!=0) {
 	                    m68ki_bus_error(address, MODE_WRITE);
 		    }
              }
@@ -312,8 +312,8 @@ void accessIo(uint32 address,int *ioval,int rwMode,int size)
      } // of else
 }
 
-void setRreadWildIO(int mode) {
-	ReadWildIOBERR=mode;
+void setWriteWildIO(int mode) {
+	WriteWildIOBERR=mode;
 }
 
 void initIo(void) 

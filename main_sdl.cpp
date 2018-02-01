@@ -981,6 +981,9 @@ int main(int argc,char ** argv) {
     //IDLE_INIT_FUNC("main()");
 	// init();
 
+    // by default no bus error for unmapped IO
+    setWriteWildIO(0);
+
     for (argnum=1;argnum<argc;argnum++) {
         if (strcmp(argv[argnum],"-console")==0) {
             g_isConsole=1;
@@ -997,8 +1000,8 @@ int main(int argc,char ** argv) {
         if (strcmp(argv[argnum],"-v")==0) {
             init_trace(stdout);
         }
-        if (strcmp(argv[argnum],"-gemdos")==0) {
-            setRreadWildIO(0);
+        if (strcmp(argv[argnum],"-ioberr")==0) {
+            setWriteWildIO(1);
         }
     }
     
