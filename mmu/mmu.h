@@ -51,6 +51,7 @@ int must_redraw(void);
 uint16 LisaGetWDebug(uint32 address);
 uint16 LisaGetWDebugCtxt(uint32 address,int ctxt);
 char*   MemInit(int model);
+void setRreadWildIO(int mode);
 void mmuReset(void);
 void refresh_mmu_box(void);
 char *get_address_info_phys(uint32 address);

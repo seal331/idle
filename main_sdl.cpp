@@ -721,6 +721,7 @@ lisa_loop(uint32 targetPC)
      next_time = SDL_GetTicks() + TICK_INTERVAL;
 
 
+
      while (1) {
 		while ( SDL_PollEvent(&event) )
 		{
@@ -731,6 +732,10 @@ lisa_loop(uint32 targetPC)
 				    if (event.key.keysym.sym==SDLK_F11) {
 				        toggleFullScreen();
 				        redraw_lisa(1);
+				        break;
+				    }
+				    if (event.key.keysym.sym==SDLK_F12) {
+				        targetPC=0x0E449A;
 				        break;
 				    }
 				    handleSdlKeyEvent(&event);
@@ -992,7 +997,9 @@ int main(int argc,char ** argv) {
         if (strcmp(argv[argnum],"-v")==0) {
             init_trace(stdout);
         }
-        
+        if (strcmp(argv[argnum],"-gemdos")==0) {
+            setRreadWildIO(0);
+        }
     }
     
 

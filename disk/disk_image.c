@@ -100,6 +100,21 @@ int check_inserted(int drive) {
     return 0;   
 }
 
+int format_floppy(int drive) {
+    FloppyType *disk;
+    if (drive==0) disk=&diska;
+    else
+        disk=&diskb;
+        
+    if (disk->init==0) 
+    {
+       return 7;
+    }
+    
+    memset(disk->sectors,0,disk->sectorsize*disk->numblocks);
+    memset(disk->tags,0,disk->tagsize*disk->numblocks);
+    return 0;
+}
 
 int read_sector(int drive,int track,int sector,int side,unsigned char **data,unsigned char **tags,int *datasize,int *tagsize)
 {

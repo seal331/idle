@@ -39,6 +39,7 @@ uint32           *pcWhenWrite;
 uint32           *addrWhenWrite;
 #endif
 
+static int ReadWildIOBERR=1;
 
 // the MMU description
 static int mmuSTART;
@@ -247,42 +248,42 @@ void accessIo(uint32 address,int *ioval,int rwMode,int size)
              switch (address&0xF000) {
                     case 0x0000 :
                     case 0x1000 :
-                         IDLE_WARN("Slot #1 low decode io=%06x pc=%06x",address,get_pc);
+                         IDLE_WARN("Slot #1 low decode %s io=%06x pc=%06x",((rwMode==IO_READ)?"read":"write"),address,get_pc);
                          if (rwMode==IO_READ)
                             *ioval=0;
                          break;
                     case 0x2000 :
                     case 0x3000 :
-                         IDLE_WARN("Slot #1 high decode io=%06x pc=%06x",address,get_pc);
+                         IDLE_WARN("Slot #1 high decode %s io=%06x pc=%06x",((rwMode==IO_READ)?"read":"write"),address,get_pc);
                          if (rwMode==IO_READ)
                             *ioval=0;
                          break;
                     case 0x4000 :
                     case 0x5000 :
-                         IDLE_WARN("Slot #2 low decode io=%06x pc=%06x",address,get_pc);
+                         IDLE_WARN("Slot #2 low decode %s io=%06x pc=%06x",((rwMode==IO_READ)?"read":"write"),address,get_pc);
                          if (rwMode==IO_READ)
                             *ioval=0;
                          break;
                     case 0x6000 :
                     case 0x7000 :
-                         IDLE_WARN("Slot #2 high decode io=%06x pc=%06x",address,get_pc);
+                         IDLE_WARN("Slot #2 high decode %s io=%06x pc=%06x",((rwMode==IO_READ)?"read":"write"),address,get_pc);
                          if (rwMode==IO_READ)
                             *ioval=0;
                          break;
                     case 0x8000 :
                     case 0x9000 :
-                         IDLE_WARN("Slot #3 low decode io=%06x pc=%06x",address,get_pc);
+                         IDLE_WARN("Slot #3 low decode %s io=%06x pc=%06x",((rwMode==IO_READ)?"read":"write"),address,get_pc);
                          if (rwMode==IO_READ)
                             *ioval=0;
                          break;
                     case 0xA000 :
                     case 0xB000 :
-                         IDLE_WARN("Slot #3 high decode io=%06x pc=%06x",address,get_pc);
+                         IDLE_WARN("Slot #3 high decode %s io=%06x pc=%06x",((rwMode==IO_READ)?"read":"write"),address,get_pc);
                          if (rwMode==IO_READ)
                             *ioval=0;
                          break;
                     default:
-                            IDLE_WARN("unexpected io=%06x pc=%06x",address,get_pc);
+                            IDLE_WARN("unexpected %s io=%06x pc=%06x",((rwMode==IO_READ)?"read":"write"),address,get_pc);
                             if (rwMode==IO_READ)
                             if (size==IO_BYTE)
                                *ioval=0xff;
@@ -303,10 +304,16 @@ void accessIo(uint32 address,int *ioval,int rwMode,int size)
              {
               // mark bus timeout in status
                     mmuSTATUS&=(~8); 
-                    m68ki_bus_error(address, MODE_WRITE);
+		    if (ReadWildIOBERR!=0) {
+	                    m68ki_bus_error(address, MODE_WRITE);
+		    }
              }
           } // of else
      } // of else
+}
+
+void setRreadWildIO(int mode) {
+	ReadWildIOBERR=mode;
 }
 
 void initIo(void) 

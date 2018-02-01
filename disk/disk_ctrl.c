@@ -110,10 +110,15 @@ int state_88(void);
 int state_81_00(void);
 int state_81_01(void);
 int state_81_02(void);
+int state_81_03(void);
+int state_81_04(void);
 int state_81_09(void);
+
 int state_81_00_bis(void);
 int state_81_01_bis(void);
 int state_81_02_bis(void);
+int state_81_03_bis(void);
+int state_81_04_bis(void);
 
 // the machine state
 floppy_auto_state floppy_auto[]= {
@@ -140,6 +145,10 @@ floppy_auto_state floppy_auto[]= {
 {"got_81_02",           state_81_02,      21, 0.001}, // 20
 {"got_81_02_bis",       state_81_02_bis,  1,  0.01}, // 21
 {"got_81_09",           state_81_09,      1, 0.01}, // 22
+{"got_81_03",           state_81_03,      24, 2.0}, // 23
+{"got_81_03_bis",       state_81_03_bis,  1,  0.01}, // 24
+{"got_81_04",           state_81_04,      26, 2.0}, // 25
+{"got_81_04_bis",       state_81_04_bis,  1,  0.01}, // 26
 {"void",                NULL,             0,  1.0}    // ..
 };
 
@@ -271,6 +280,10 @@ int state_81(void) {
            case 0x01 : return 18;
            case 0x02 : return 20;
            case 0x09 : return 22;
+// add format command
+           case 0x03 : return 23;
+// add verify command
+           case 0x04 : return 25;
     }
     return -1;
 }
@@ -330,6 +343,19 @@ int state_88(void) {
     return -1;
 }
 
+char *printTags(uint8 *tags,int tagSize) {
+   static char r[32];
+   int i;
+   for (i=0;i<tagSize;i++) {
+	if ((tags[i]>=' ') && (tags[i]<127)) {
+		r[i]=tags[i];
+	} else {
+		r[i]='.';
+	}
+   }
+   r[i]='\0';
+   return r;
+}
 
 int state_81_00(void) {
     uint8 *data;
@@ -358,7 +384,7 @@ int state_81_00(void) {
                             
        memcpy(&floppy_shared_tab[0x1F4],tags,tagsize);
        memcpy(&floppy_shared_tab[0x1F4+tagsize],data,datasize);
-       IDLE_TRACE("FILEID %02x%02x",tags[4],tags[5]);
+       IDLE_TRACE("FILEID %02x%02x tags=%s",tags[4],tags[5],printTags(tags,tagsize));
     }
     else
        floppy_shared_tab[0x0008]=ret;
@@ -386,7 +412,7 @@ int state_81_01(void) {
                             
     memcpy(wdata,&floppy_shared_tab[0x1F4+12],512);
     memcpy(wtags,&floppy_shared_tab[0x1F4],12);
-    IDLE_DEBUG("FILEID %02x%02x",wtags[4],wtags[5]);
+    IDLE_TRACE("FILEID %02x%02x tags=%s",wtags[4],wtags[5],printTags(wtags,12));
 
     ret=write_sector(((memo_drive==0)?0:1),memo_track,memo_sector,memo_side,
                      wdata,wtags);
@@ -398,6 +424,24 @@ int state_81_01(void) {
 int state_81_02(void) {
     IDLE_INIT_FUNC("state_81_02()");
     IDLE_TRACE("called UNCLAMP");
+    floppy_shared_tab[0x0008]=0;
+    via_reset_DIAG();
+    return -1;
+}
+
+int state_81_03(void) {
+    IDLE_INIT_FUNC("state_81_03()");
+    IDLE_TRACE("called FORMAT");
+    floppy_shared_tab[0x0008]=0;
+    floppy_shared_tab[0x0009]=0;
+    floppy_shared_tab[0x0257]=0xFF;
+    via_reset_DIAG();
+    return -1;
+}
+
+int state_81_04(void) {
+    IDLE_INIT_FUNC("state_81_04()");
+    IDLE_TRACE("called VERIFY");
     floppy_shared_tab[0x0008]=0;
     via_reset_DIAG();
     return -1;
@@ -442,6 +486,34 @@ int state_81_02_bis(void) {
     gobyte=0;
     unclamp(drive);
     disk_present=0;
+    return -1;
+}
+
+int state_81_03_bis(void) {
+   IDLE_INIT_FUNC("state_81_03_bis()");
+    IDLE_TRACE("called end FORMAT");
+    via_reset_DIAG();
+    floppy_shared_tab[0x0257]=0x00;
+    if (memo_drive!=0)
+        floppy_shared_tab[0x002f]|=0x40;
+    else
+        floppy_shared_tab[0x002f]|=0x04;
+    E_1518();         
+    gobyte=0;  
+    format_floppy(memo_drive);
+    return -1;
+}
+
+int state_81_04_bis(void) {
+   IDLE_INIT_FUNC("state_81_04_bis()");
+    IDLE_TRACE("called end VERIFY");
+    via_reset_DIAG();
+    if (memo_drive!=0)
+        floppy_shared_tab[0x002f]|=0x40;
+    else
+        floppy_shared_tab[0x002f]|=0x04;
+    E_1518();         
+    gobyte=0;  
     return -1;
 }
 
