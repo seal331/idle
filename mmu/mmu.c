@@ -383,6 +383,7 @@ void setVIDEOADDR(int* val,int mode,int size)
      if (mode==IO_WRITE)
      {
          videoADDR=(*val)&0x3F;
+	IDLE_TRACE("Video address base=%x",*val);
          videoADDR15=videoADDR<<15;
      }
      else

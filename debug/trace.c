@@ -183,7 +183,7 @@ get_log_str(char *str,int str_size) {
 		str_where++;
 		cur_line=(cur_line+1)%LOG_NB_LINES;
 	}
-	str_where='\0';
+	*str_where='\0';
 }
 void
 set_trace_time(int a_time) {

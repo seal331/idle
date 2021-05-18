@@ -405,6 +405,7 @@ int sdl2lisa_scancode(SDLKey key,unsigned char lisaMode)
 
            case SDLK_SLASH : lkey=0x4C ;break;
            case SDLK_COMMA : lkey=0x5D ;break;
+	   case SDLK_PERIOD : lkey=0x5E ;break;
 //           case SDLK_STOP   : lkey=0x5E ;break;
 
            case SDLK_LEFTBRACKET : lkey=0x56 ;break;
@@ -455,7 +456,10 @@ int sdl2lisa_scancode(SDLKey key,unsigned char lisaMode)
            case SDLK_F5 :lkey=0x7C;
                         break;
 
-           case SDLK_F8 : loop_exit=1;
+           case SDLK_F6 :lkey=0x4C;
+                        break;
+
+           // case SDLK_F8 : loop_exit=1;
            // under allegro this will cause program end
            // case KEY_ESC : loop_exit=1;
            

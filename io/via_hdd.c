@@ -517,7 +517,7 @@ void hdd_irq(int event) {
 
 
 #define PROFILE_STR_LEN (4+13+3+2+3+2+1+1+1+4)
-char profile_str[PROFILE_STR_LEN]={
+unsigned char profile_str[PROFILE_STR_LEN]={
      0x00,0x00,0x00,0x00,
      'P','R','O','F','I','L','E',' ',' ',' ',' ',' ',' ',
      0x00,0x00,0x00,
@@ -529,7 +529,7 @@ char profile_str[PROFILE_STR_LEN]={
      0x00,
      0xff, 0xff, 0xff, 0x00 }; 
 
-char widget_str[PROFILE_STR_LEN]={
+unsigned char widget_str[PROFILE_STR_LEN]={
      0x00,0x00,0x00,0x00,
      'W','I','D','G','E','T',' ',' ',' ',' ',' ',' ',' ',
      0x00,0x00,0x00,
