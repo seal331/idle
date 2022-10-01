@@ -739,7 +739,8 @@ lisa_loop(uint32 targetPC)
 				        break;
 				    }
 				    if (event.key.keysym.sym==SDLK_F12) {
-				        targetPC=0x0E449A;
+				        unscare_mouse();
+					return 0;
 				        break;
 				    }
 				    handleSdlKeyEvent(&event);
